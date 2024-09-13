@@ -1,0 +1,13 @@
+heartBeatProj/Lib
+heartBeatProj/.idea
+heartBeatProj/Include
+heartBeatProj/Scripts
+heartBeatProj/pyvenv.cfg
+heartBeatProject
+heartBeatProj
+venv
+.idea
+heartbeatBe/__pycache__
+heartbeatBe/heartbeat/__pycache__
+heartbeatBe/heartbeatBe/__pycache__
+heartbeatBe/heartbeat/migrations/__pycache__
