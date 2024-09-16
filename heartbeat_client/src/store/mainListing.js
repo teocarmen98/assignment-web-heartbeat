@@ -34,9 +34,6 @@ const actions = {
         return await getMainListing(filter)
         .then(response => {
             let data = response.data.data
-            data.forEach((element) => {
-                element.status = element.status ? 'ACTIVE' : 'INACTIVE'
-            });
             commit('setState', {fieldname: 'tableData', value: data })
             commit('setState', {fieldname: 'totalSize', value: response.data.total })
             dispatch('setTotalPage', { sum: response.data.total, limit: state.limit})

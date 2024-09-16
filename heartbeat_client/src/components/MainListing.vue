@@ -10,14 +10,14 @@
                 @click="openDetailPopup"
             > CREATE </button>
         </div>
-        <div class="table-responsive" style="max-height: 650px; overflow-y: auto; padding: 20px; margin-top: 20px;">
+        <div class="table-container">
             <table class="table">
                 <thead>
                     <tr>
                         <th
                             v-for="(value, key) in schema"
                             :key="key"
-                            :style="{width: value.width}"
+                            :style="{'max-width': value.maxWidth}"
                         > {{ value.label }}
                         </th>
                         <th>Actions</th>
@@ -31,9 +31,20 @@
                         <td
                             v-for="(value, key) in schema"
                             :key="key"
-                            :style="{ 'max-width': value.maxWidth, 'word-wrap': 'break-word' }"
+                            :style="{ 'max-width': value.maxWidth,'word-wrap': 'break-word', 'text-align': value.textAlign ?? 'center' }"
                             :class="[color[item[key]], value.fontWeight ?? 'normal-text']"
-                        > {{ item[key] }}
+                        > 
+                            <div v-if="key !== 'status'">
+                                {{ item[key] }}
+                            </div>
+                            <div v-else-if="key === 'status'">
+                                <svg v-if="item[key]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                </svg>
+                                <svg v-if="!item[key]" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4m.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+                                </svg>
+                            </div>
                         </td>
                         <td
                             :style="{width: '200px'}">
@@ -103,8 +114,8 @@ export default {
         return {
             selectedItem: {},
             color: {
-                'ACTIVE': 'text-success',
-                'INACTIVE': 'text-danger'
+                true: 'text-success',
+                false: 'text-danger'
             },
             pageSize: 10,
             pageSizes: [10,30,50]
@@ -165,6 +176,13 @@ export default {
 </script>
 
 <style scoped>
+.table-container {
+    max-height: 650px;
+    height: 650px;
+    margin-top: 10px;
+    overflow-y: auto;
+    padding: 0px 20px;
+}
 th {
     background-color: #D9D9D9;
 }
@@ -176,8 +194,9 @@ button {
     border: none;
     margin-left: 20px;
 }
-td, th {
-    text-align: left;
+thead {
+    position: sticky;
+    top: 0;
 }
 .footer {
     margin-top: 5px;
