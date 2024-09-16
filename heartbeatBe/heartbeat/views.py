@@ -2,28 +2,27 @@ from django.contrib.sites import requests
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.parsers import JSONParser
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.core.validators import URLValidator
 from django.core.paginator import Paginator
-from django.shortcuts import render
 from .serializers import UrlItemSerializer
 from .models import UrlItem
 
 import requests
 
-# get all information / create new information
 class UrlAPIView(APIView):
     def get_object(self, pk):
         try:
             return UrlItem.objects.get(pk=pk)
-        except:
-            return HttpResponse(status=404)
+        except UrlItem.DoesNotExist:
+            raise Http404("Data Not Found")
 
     def get(self, request, pk=None, format=None):
         if pk:
-            url = UrlItem.objects.get(pk=pk)
-            serializer = UrlItemSerializer(url)
-            return JsonResponse(serializer.data)
+            if self.get_object(pk):
+                url = UrlItem.objects.get(pk=pk)
+                serializer = UrlItemSerializer(url)
+                return JsonResponse(serializer.data)
         else:
             urls_item_list = UrlItem.objects.all()
             paginator = Paginator(urls_item_list, request.GET.get('limit'))
@@ -52,22 +51,24 @@ class UrlAPIView(APIView):
         return JsonResponse({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None, format=None):
-        new_data= request.data
 
-        check_url_format_result = self.check_url_format(new_data['url'])
+        if self.get_object(pk):
+            new_data= request.data
 
-        if check_url_format_result:
-            check_status_result = self.check_status(new_data['url'])
-            new_data['status'] = check_status_result
+            check_url_format_result = self.check_url_format(new_data['url'])
 
-            serializer = UrlItemSerializer(self.get_object(pk), data=new_data)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data)
-            if serializer.errors['url'][0].code == 'unique':
-                return JsonResponse({'error': 'URL Exist'}, status=status.HTTP_400_BAD_REQUEST)
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
+            if check_url_format_result:
+                check_status_result = self.check_status(new_data['url'])
+                new_data['status'] = check_status_result
+
+                serializer = UrlItemSerializer(self.get_object(pk), data=new_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return JsonResponse(serializer.data)
+                if serializer.errors['url'][0].code == 'unique':
+                    return JsonResponse({'error': 'URL Exist'}, status=status.HTTP_400_BAD_REQUEST)
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         self.get_object(pk).delete()
@@ -108,7 +109,6 @@ class UrlAPIView(APIView):
 
     # refresh every 2s
     def refresh_data(self):
-        print('test running')
         urls_item_list = UrlItem.objects.all()
         serializer = UrlItemSerializer(urls_item_list, many=True)
         for item in serializer.data:
