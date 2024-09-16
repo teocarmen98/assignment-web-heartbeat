@@ -2,11 +2,12 @@ export const mainListingSchema = {
     url: {
         type: String,
         label: 'URL',
-        width: '800px',
+        maxWidth: '800px'
     },
     status: {
         type: String,
         label: 'Status',
-        width: '120px'
+        maxWidth: '120px',
+        fontWeight: 'font-weight-bolder',
     },
 }

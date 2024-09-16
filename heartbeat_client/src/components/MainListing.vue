@@ -10,7 +10,7 @@
                 @click="openDetailPopup"
             > CREATE </button>
         </div>
-        <div class="table-container">
+        <div class="table-responsive" style="max-height: 650px; overflow-y: auto; padding: 20px; margin-top: 20px;">
             <table class="table">
                 <thead>
                     <tr>
@@ -31,26 +31,28 @@
                         <td
                             v-for="(value, key) in schema"
                             :key="key"
-                            :style="{ width: value.width}"
-                            :class="color[item[key]]"
+                            :style="{ 'max-width': value.maxWidth, 'word-wrap': 'break-word' }"
+                            :class="[color[item[key]], value.fontWeight ?? 'normal-text']"
                         > {{ item[key] }}
                         </td>
                         <td
                             :style="{width: '200px'}">
-                            <button
-                                type="button"
-                                class = "btn btn-primary btn-sm"
-                                @click="editItem(item)"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                type="button"
-                                class = "btn btn-danger btn-sm ml-2"
-                                @click="deleteItem(item)"
-                            >
-                                Delete
-                            </button>
+                            <div class="d-flex">
+                                <button
+                                    type="button"
+                                    class = "btn btn-primary btn-sm"
+                                    @click="editItem(item)"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    type="button"
+                                    class = "btn btn-danger btn-sm ml-2"
+                                    @click="deleteItem(item)"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -61,8 +63,8 @@
             <select v-model="pageSize" @change="updatePageSize">
                 <option v-for="(size, key) in pageSizes" :value="size" :key="key">{{ size }}</option>
             </select>
-            <div class="button-container">
-                <button @click='previosPage()' :disabled="currentPage === 1" class = "btn btn-primary btn-sm">Prvious</button>
+            <div class="footer-button">
+                <button @click='previosPage()' :disabled="currentPage === 1" class = "btn btn-primary btn-sm">Previous</button>
                 <button @click='nextPage()' :disabled="currentPage === totalPage" class = "btn btn-primary btn-sm">Next</button>
             </div>
         </div>
@@ -163,12 +165,6 @@ export default {
 </script>
 
 <style scoped>
-.table-container {
-    height: 750px;
-    margin-top: 5px;
-    overflow-y: auto;
-    padding: 20px;
-}
 th {
     background-color: #D9D9D9;
 }
@@ -180,17 +176,17 @@ button {
     border: none;
     margin-left: 20px;
 }
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-    width: 80%;
-}
 td, th {
     text-align: left;
 }
 .footer {
     margin-top: 5px;
     margin-left: 20px;
+    display: flex;
+}
+.footer-button {
+    margin-left: auto;
+    margin-right: 50px;
     display: flex;
 }
 select {
