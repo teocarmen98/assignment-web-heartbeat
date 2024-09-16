@@ -2,7 +2,7 @@ export const mainListingSchema = {
     url: {
         type: String,
         label: 'URL',
-        maxWidth: '800px',
+        maxWidth: '200px',
         textAlign: 'left',
     },
     status: {
